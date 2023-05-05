@@ -29,6 +29,11 @@ impl Context {
     pub fn handle(&self) -> ContextHandle {
         ContextHandle { ctx: self }
     }
+
+    /// Returns a handle to the underlying Z3_context
+    pub fn ctx(&self) -> Z3_context {
+        self.z3_ctx
+    }
 }
 
 impl<'ctx> ContextHandle<'ctx> {
