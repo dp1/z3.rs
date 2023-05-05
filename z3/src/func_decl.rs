@@ -1,10 +1,12 @@
 use ast;
 use ast::Ast;
-use std::convert::TryInto;
+use std::convert::{TryFrom, TryInto};
 use std::ffi::CStr;
 use std::fmt;
 use z3_sys::*;
-use {Context, FuncDecl, Sort, Symbol};
+
+use crate::ast::Dynamic;
+use {Context, DeclParam, FuncDecl, Sort, Symbol};
 
 impl<'ctx> FuncDecl<'ctx> {
     pub(crate) unsafe fn wrap(ctx: &'ctx Context, z3_func_decl: Z3_func_decl) -> Self {
@@ -96,6 +98,57 @@ impl<'ctx> FuncDecl<'ctx> {
                 SymbolKind::Int => format!("k!{}", Z3_get_symbol_int(z3_ctx, symbol)),
             }
         }
+    }
+
+    pub fn num_params(&self) -> usize {
+        unsafe { Z3_get_decl_num_parameters(self.ctx.z3_ctx, self.z3_func_decl) as usize }
+    }
+
+    pub fn nth_param(&self, idx: usize) -> Option<DeclParam<'ctx>> {
+        if idx >= self.num_params() {
+            return None;
+        }
+
+        let z3_ctx = self.ctx.z3_ctx;
+        let idx = u32::try_from(idx).unwrap();
+        unsafe {
+            match Z3_get_decl_parameter_kind(z3_ctx, self.z3_func_decl, idx) {
+                ParameterKind::Int => {
+                    let x = Z3_get_decl_int_parameter(z3_ctx, self.z3_func_decl, idx);
+                    Some(DeclParam::Int(x))
+                }
+                ParameterKind::Double => {
+                    let x = Z3_get_decl_double_parameter(z3_ctx, self.z3_func_decl, idx);
+                    Some(DeclParam::Double(x))
+                }
+                ParameterKind::Rational => {
+                    let x = Z3_get_decl_rational_parameter(z3_ctx, self.z3_func_decl, idx);
+                    let x = CStr::from_ptr(x).to_owned().into_string().unwrap();
+                    Some(DeclParam::Rational(x))
+                }
+                ParameterKind::Symbol => {
+                    let x = Z3_get_decl_symbol_parameter(z3_ctx, self.z3_func_decl, idx);
+                    Some(DeclParam::Symbol(Symbol::wrap(self.ctx, x)))
+                }
+                ParameterKind::Sort => {
+                    let x = Z3_get_decl_sort_parameter(z3_ctx, self.z3_func_decl, idx);
+                    Some(DeclParam::Sort(Sort::wrap(self.ctx, x)))
+                }
+                ParameterKind::AST => {
+                    let x = Z3_get_decl_ast_parameter(z3_ctx, self.z3_func_decl, idx);
+                    Some(DeclParam::Ast(Dynamic::wrap(self.ctx, x)))
+                }
+                ParameterKind::FuncDecl => {
+                    let x = Z3_get_decl_func_decl_parameter(z3_ctx, self.z3_func_decl, idx);
+                    Some(DeclParam::FuncDecl(FuncDecl::wrap(self.ctx, x)))
+                }
+            }
+        }
+    }
+
+    pub fn params(&self) -> Vec<DeclParam<'ctx>> {
+        let n = self.num_params();
+        (0..n).map(|i| self.nth_param(i).unwrap()).collect()
     }
 }
 

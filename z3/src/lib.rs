@@ -161,6 +161,17 @@ pub struct FuncDecl<'ctx> {
     z3_func_decl: Z3_func_decl,
 }
 
+#[derive(Debug)]
+pub enum DeclParam<'ctx> {
+    Int(i32),
+    Double(f64),
+    Rational(String),
+    Symbol(Symbol),
+    Sort(Sort<'ctx>),
+    Ast(ast::Dynamic<'ctx>),
+    FuncDecl(FuncDecl<'ctx>),
+}
+
 /// Stores the interpretation of a function in a Z3 model.
 /// https://z3prover.github.io/api/html/classz3py_1_1_func_interp.html
 pub struct FuncInterp<'ctx> {
