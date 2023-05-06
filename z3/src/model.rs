@@ -10,7 +10,7 @@ use Solver;
 use crate::{FuncDecl, FuncInterp};
 
 impl<'ctx> Model<'ctx> {
-    unsafe fn wrap(ctx: &'ctx Context, z3_mdl: Z3_model) -> Model<'ctx> {
+    pub unsafe fn wrap(ctx: &'ctx Context, z3_mdl: Z3_model) -> Model<'ctx> {
         Z3_model_inc_ref(ctx.z3_ctx, z3_mdl);
         Model { ctx, z3_mdl }
     }

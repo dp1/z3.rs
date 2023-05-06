@@ -39,6 +39,10 @@ impl<'ctx> FuncDecl<'ctx> {
         }
     }
 
+    pub fn decl(&self) -> Z3_func_decl {
+        self.z3_func_decl
+    }
+
     /// Return the number of arguments of a function declaration.
     ///
     /// If the function declaration is a constant, then the arity is `0`.
@@ -97,6 +101,14 @@ impl<'ctx> FuncDecl<'ctx> {
                     .into_owned(),
                 SymbolKind::Int => format!("k!{}", Z3_get_symbol_int(z3_ctx, symbol)),
             }
+        }
+    }
+
+    pub fn symbol(&self) -> Symbol {
+        unsafe {
+            let z3_ctx = self.ctx.z3_ctx;
+            let symbol = Z3_get_decl_name(z3_ctx, self.z3_func_decl);
+            Symbol::wrap(self.ctx, symbol)
         }
     }
 

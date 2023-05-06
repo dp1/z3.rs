@@ -417,6 +417,12 @@ pub trait Ast<'ctx>: fmt::Debug {
             })
         }
     }
+
+    fn get_id(&self) -> u32 {
+        unsafe {
+            Z3_get_ast_id(self.get_ctx().z3_ctx, self.get_z3_ast())
+        }
+    }
 }
 
 macro_rules! impl_ast {
@@ -1137,8 +1143,8 @@ impl<'ctx> String<'ctx> {
             }
         }
     }
-   
-    /// Checks if this string matches a `z3::ast::Regexp` 
+
+    /// Checks if this string matches a `z3::ast::Regexp`
     pub fn regex_matches(&self, regex: &Regexp) -> Bool<'ctx> {
         assert!(self.ctx == regex.ctx);
         unsafe {
@@ -1765,7 +1771,7 @@ impl<'ctx> Regexp<'ctx> {
                 Z3_inc_ref(ctx.z3_ctx, lo_z3s);
                 let hi_z3s = Z3_mk_string(ctx.z3_ctx, hi_cs.as_ptr());
                 Z3_inc_ref(ctx.z3_ctx, hi_z3s);
-                
+
                 let ret = Z3_mk_re_range(ctx.z3_ctx, lo_z3s, hi_z3s);
                 Z3_dec_ref(ctx.z3_ctx, lo_z3s);
                 Z3_dec_ref(ctx.z3_ctx, hi_z3s);
@@ -1773,7 +1779,7 @@ impl<'ctx> Regexp<'ctx> {
             })
         }
     }
-    
+
     /// Creates a regular expression that recognizes this regular expression `lo` to `hi` times (e.g. `a{2,3}`)
     pub fn r#loop(&self, lo: u32, hi: u32) -> Self {
         unsafe {
@@ -1791,7 +1797,7 @@ impl<'ctx> Regexp<'ctx> {
             })
         }
     }
-    
+
     /// Creates a regular expression that doesn't recognize any sequences
     pub fn empty(ctx: &'ctx Context) -> Self {
         unsafe {
@@ -1803,12 +1809,12 @@ impl<'ctx> Regexp<'ctx> {
 
     unop! {
        /// Creates a regular expression that recognizes this regular expression one or more times (e.g. `a+`)
-       plus(Z3_mk_re_plus, Self); 
+       plus(Z3_mk_re_plus, Self);
        /// Creates a regular expression that recognizes this regular expression any number of times
        /// (Kleene star, e.g. `a*`)
        star(Z3_mk_re_star, Self);
        /// Creates a regular expression that recognizes any sequence that this regular expression
-       /// doesn't 
+       /// doesn't
        complement(Z3_mk_re_complement, Self);
     }
     varop! {
@@ -1818,7 +1824,7 @@ impl<'ctx> Regexp<'ctx> {
        /// expressions given as parameters recognize
         union(Z3_mk_re_union, Self);
         /// Creates a regular expression that only recognizes sequences that all of the parameters
-        /// recognize 
+        /// recognize
         intersect(Z3_mk_re_intersect, Self);
     }
 
