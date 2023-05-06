@@ -7655,6 +7655,9 @@ extern "C" {
 
     /// Best-effort quantifier elimination
     pub fn Z3_qe_lite(c: Z3_context, vars: Z3_ast_vector, body: Z3_ast) -> Z3_ast;
+
+    /// Custom eval Z3 AST
+    pub fn Z3_custom_eval(c: Z3_context, e: Z3_ast, data: *const u64, symbol_sizes: *const u8, size: usize) -> u64;
 }
 
 #[cfg(not(windows))]
