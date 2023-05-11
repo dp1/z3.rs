@@ -87,7 +87,7 @@ impl<'ctx> FuncDecl<'ctx> {
     /// Note that `args` should have the types corresponding to the `domain` of the `FuncDecl`.
     ///
     /// This variant of `apply` takes in concrete Dynamic<'ctx> objects as args
-    pub fn apply_to_dynamic(&self, args: &[&Dynamic<'ctx>]) -> ast::Dynamic<'ctx> {
+    pub fn apply_to_dynamic(&self, args: &[Dynamic<'ctx>]) -> ast::Dynamic<'ctx> {
         assert!(args.iter().all(|s| s.get_ctx().z3_ctx == self.ctx.z3_ctx));
 
         let args: Vec<_> = args.iter().map(|a| a.get_z3_ast()).collect();
