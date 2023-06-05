@@ -7658,6 +7658,7 @@ extern "C" {
 
     /// Custom eval Z3 AST
     pub fn Z3_custom_eval(c: Z3_context, e: Z3_ast, data: *const u64, symbol_sizes: *const u8, size: usize) -> u64;
+    pub fn Z3_custom_eval_depth(c: Z3_context, e: Z3_ast, data: *const u64, symbol_sizes: *const u8, size: usize, depth: *mut u32) -> u64;
 }
 
 #[cfg(not(windows))]
