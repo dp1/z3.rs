@@ -12,6 +12,17 @@ impl Context {
                 Z3_set_error_handler(p, None);
                 p
             },
+            is_owned: true,
+        }
+    }
+
+    /// Create a context around an existing Z3_context. This constructor DOES NOT take ownership of
+    /// z3_ctx, it needs to be manually freed after this object is dropped.
+    pub unsafe fn wrap(z3_ctx: Z3_context) -> Context {
+        assert!(!z3_ctx.is_null());
+        Context {
+            z3_ctx,
+            is_owned: false,
         }
     }
 
@@ -50,6 +61,8 @@ unsafe impl<'ctx> Send for ContextHandle<'ctx> {}
 
 impl Drop for Context {
     fn drop(&mut self) {
-        unsafe { Z3_del_context(self.z3_ctx) };
+        if self.is_owned {
+            unsafe { Z3_del_context(self.z3_ctx) }
+        }
     }
 }

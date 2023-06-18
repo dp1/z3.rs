@@ -74,6 +74,7 @@ pub struct Config {
 #[derive(PartialEq, Eq, Debug)]
 pub struct Context {
     z3_ctx: Z3_context,
+    is_owned: bool,
 }
 
 /// Handle that can be used to interrupt a computation from another thread.
