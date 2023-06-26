@@ -17,6 +17,10 @@ fn main() {
     };
     println!("cargo:rerun-if-env-changed={}", Z3_HEADER_VAR);
     println!("cargo:rerun-if-changed={}", header);
+    if cfg!(feature = "static-link-z3") {
+        println!("cargo:rerun-if-changed=z3/*");
+    }
+
     let out_path = std::path::PathBuf::from(std::env::var("OUT_DIR").unwrap());
 
     for x in &[
